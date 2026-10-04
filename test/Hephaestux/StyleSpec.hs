@@ -29,9 +29,15 @@ spec = do
     it "uses defaults and symbol fallback" $
       renderSegments noOverride True MarginNone [mk "codex" (Just "Cx") Working]
         `shouldBe` "#[fg=#ff8c00]Cx#[default]"
-    it "falls back to name without symbol" $
+    it "falls back to the registry symbol" $
       renderSegments noOverride True MarginNone [mk "codex" Nothing Working]
-        `shouldBe` "#[fg=#ff8c00]codex#[default]"
+        `shouldBe` "#[fg=#ff8c00]Cx#[default]"
+    it "prefers an explicit symbol over the registry" $
+      renderSegments noOverride True MarginNone [mk "codex" (Just "Ω") Working]
+        `shouldBe` "#[fg=#ff8c00]Ω#[default]"
+    it "falls back to name for unknown agents" $
+      renderSegments noOverride True MarginNone [mk "mystery" Nothing Working]
+        `shouldBe` "#[fg=#ff8c00]mystery#[default]"
     it "applies bracketed overrides" $
       renderSegments (const (Just "fg=#ffaaff")) True MarginNone [mk "codex" (Just "Cx") Working]
         `shouldBe` "#[fg=#ffaaff]Cx#[default]"

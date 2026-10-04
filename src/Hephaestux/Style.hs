@@ -9,6 +9,7 @@ where
 import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import qualified Data.Text as Text
+import Hephaestux.Agents (labelFor)
 import Hephaestux.Types (Agent (..), SessionInfo (..), SessionState (..), State (..))
 
 defaultStyle :: State -> Text
@@ -37,5 +38,5 @@ renderSegments override padding margin infos = case margin of
       Text.intercalate (if padding then " " else "") . map segment $ infos
     segment info =
       let style = fromMaybe (defaultStyle info.session.state) (override info.session.state)
-          label = fromMaybe info.agent.name info.agent.symbol
+          label = labelFor info.agent
        in "#[" <> style <> "]" <> label <> "#[default]"

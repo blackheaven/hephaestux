@@ -8,7 +8,7 @@ import Data.Maybe (catMaybes, fromMaybe)
 import Data.Text (Text)
 import qualified Data.Text as Text
 import qualified Data.Text.IO as TextIO
-import Hephaestux.Agents (AgentSpec (..), agentNames, lookupAgent)
+import Hephaestux.Agents (AgentSpec (..), agentNames, labelFor, lookupAgent)
 import Hephaestux.Cli
 import Hephaestux.Install (runAgent)
 import Hephaestux.Process (ancestorChain, pidAlive, resolveAgentPid, resolveEndTarget)
@@ -40,10 +40,9 @@ update :: UpdateOptions -> IO ()
 update u = do
   spec <- agentSpecOf u.uoAgent
   pids <- ancestorChain
-  let sym = Just (fromMaybe spec.symbol u.uoSymbol)
-      info =
+  let info =
         SessionInfo
-          { agent = Agent {name = u.uoAgent, symbol = sym},
+          { agent = Agent {name = u.uoAgent, symbol = u.uoSymbol},
             session = SessionState {state = u.uoState, title = u.uoTitle}
           }
   pid <- resolveAgentPid spec.procNames pids
@@ -85,7 +84,7 @@ list l = do
       Right loc ->
         let s = infoOf pid
          in TextIO.putStrLn
-              ( labelOf s
+              ( labelOf s.agent
                   <> "  "
                   <> stateName s.session.state
                   <> "  "
@@ -94,7 +93,7 @@ list l = do
                   <> fromMaybe "--" s.session.title
               )
   where
-    labelOf s = fromMaybe s.agent.name s.agent.symbol
+    labelOf = labelFor
 
 locText :: Location -> Text
 locText loc =
